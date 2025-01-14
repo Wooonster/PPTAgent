@@ -23,12 +23,14 @@ class ImageLabler:
                     self.image_stats[pbasename(name)] = stat
 
     def apply_stats(self):
+        '''将生成的描述应用到幻灯片中的图片形状'''
         for slide in self.presentation.slides:
             for shape in slide.shape_filter(Picture):
                 stats = self.image_stats[pbasename(shape.img_path)]
                 shape.caption = stats["caption"]
 
     def caption_images(self):
+        '''用 vllm 为没有描述的图片生成描述'''
         caption_prompt = open("prompts/caption.txt").read()
         for image, stats in self.image_stats.items():
             if "caption" not in stats:
@@ -46,6 +48,10 @@ class ImageLabler:
         return self.image_stats
 
     def collect_images(self):
+        '''从演示文稿中提取图片信息并生成统计数据
+        
+        统计信息包括：图片出现的次数、所在的幻灯片编号集合、相对于幻灯片总面积的百分比、图片的尺寸（宽度和高度）
+        '''
         for slide_index, slide in enumerate(self.presentation.slides):
             for shape in slide.shape_filter(Picture):
                 image_path = pbasename(shape.data[0])
@@ -59,9 +65,11 @@ class ImageLabler:
                 }
                 self.image_stats[image_path]["appear_times"] += 1
                 self.image_stats[image_path]["slide_numbers"].add(slide_index + 1)
+
         for image_path, stats in self.image_stats.items():
             stats["slide_numbers"] = sorted(list(stats["slide_numbers"]))
             ranges = self._find_ranges(stats["slide_numbers"])
+            # 生成图片在幻灯片中的连续范围
             top_ranges = sorted(ranges, key=lambda x: x[1] - x[0], reverse=True)[:3]
             top_ranges_str = ", ".join(
                 [f"{r[0]}-{r[1]}" if r[0] != r[1] else f"{r[0]}" for r in top_ranges]
@@ -69,6 +77,7 @@ class ImageLabler:
             stats["top_ranges_str"] = top_ranges_str
 
     def _find_ranges(self, numbers):
+        '''根据图片的幻灯片编号，生成连续范围'''
         ranges = []
         start = numbers[0]
         end = numbers[0]

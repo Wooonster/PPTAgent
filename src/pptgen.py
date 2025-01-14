@@ -22,15 +22,16 @@ from utils import Config, get_slide_content, pexists, pjoin, tenacity
 
 @dataclass
 class PPTGen(ABC):
+    # 参与生成任务的角色列表
     roles: list[str] = field(default_factory=list)
 
     def __init__(
         self,
-        text_model: BGEM3FlagModel,
+        text_model: BGEM3FlagModel,   # 文本嵌入模型
         retry_times: int = 3,
-        force_pages: bool = False,
-        error_exit: bool = True,
-        record_cost: bool = True,
+        force_pages: bool = False,    # 是否强制限制幻灯片数量
+        error_exit: bool = True,      # 是否发生错误立即退出
+        record_cost: bool = True,     
         **kwargs,
     ):
         self.text_model = text_model
@@ -41,9 +42,12 @@ class PPTGen(ABC):
 
     def set_examplar(
         self,
-        presentation: Presentation,
-        slide_induction: dict,
+        presentation: Presentation,   # ppt模版
+        slide_induction: dict,        # 模版概括
     ):
+        '''设置模板演示文稿和布局归纳结果
+        
+        生成布局嵌入向量，用于后续的布局相似性比较'''
         self.presentation = presentation
         self.slide_induction = slide_induction
         self.functional_keys = slide_induction.pop("functional_keys")
@@ -56,11 +60,12 @@ class PPTGen(ABC):
 
     def generate_pres(
         self,
-        config: Config,
-        images: dict[str, str],
-        num_slides: int,
-        doc_json: dict[str, str],
+        config: Config,            # 配置信息
+        images: dict[str, str],    # 图片
+        num_slides: int,           # 幻灯片页面
+        doc_json: dict[str, str],  # 文档
     ):
+        '''根据输入的内容和配置，生成完整的演示文稿'''
         self.config = config
         self.doc_json = doc_json
         meta_data = "\n".join(
@@ -119,6 +124,7 @@ class PPTGen(ABC):
 
     @tenacity
     def _generate_outline(self, num_slides: int):
+        '''根据文档内容生成幻灯片的大纲'''
         outline_file = pjoin(self.config.RUN_DIR, "presentation_outline.json")
         doc_overview = deepcopy(self.doc_json)
         for section in doc_overview["sections"]:
@@ -126,6 +132,7 @@ class PPTGen(ABC):
         if pexists(outline_file):
             outline = json.load(open(outline_file, "r"))
         else:
+            # planner 角色生成大纲
             outline = self.staffs["planner"](
                 num_slides=num_slides,
                 layouts="\n".join(
@@ -145,6 +152,7 @@ class PPTGen(ABC):
         return outline
 
     def _valid_outline(self, outline: dict, retry: int = 0) -> dict:
+        '''验证生成的大纲是否符合预期结构'''
         try:
             for slide in outline.values():
                 layout_sim = torch.cosine_similarity(
@@ -164,6 +172,7 @@ class PPTGen(ABC):
                     "Invalid outline structure, must be a dict with layout, subsections, description"
                 )
         except ValueError as e:
+            '''验证失败, 且还有重试次数, 调用 planner 重试'''
             print(outline, e)
             if retry < self.retry_times:
                 new_outline = self.staffs["planner"].retry(
@@ -175,6 +184,7 @@ class PPTGen(ABC):
         return outline
 
     def _hire_staffs(self, record_cost: bool, **kwargs) -> dict[str, Role]:
+        '''初始化角色对象(如 planner)'''
         jinja_env = Environment(undefined=StrictUndefined)
         self.staffs = {
             role: Role(
@@ -198,6 +208,7 @@ class PPTGen(ABC):
         pass
 
     def _generate_slide(self, slide_data, code_executor: CodeExecutor) -> SlidePage:
+        '''生成单张幻灯片内容'''
         slide_idx, (slide_title, slide) = slide_data
         images_info = "No Images"
         if any(
@@ -235,8 +246,10 @@ class PPTCrew(PPTGen):
         code_executor: CodeExecutor,
         images_info: str,
     ) -> SlidePage:
+        '''根据模板和内容生成单张幻灯片'''
         content_schema = template["content_schema"]
         old_data = self._prepare_schema(content_schema)
+        # 调用 editor 角色生成编辑输出
         editor_output = self.staffs["editor"](
             schema=content_schema,
             outline=self.simple_outline,
@@ -244,8 +257,11 @@ class PPTCrew(PPTGen):
             text=slide_content,
             images_info=images_info,
         )
+
+        # 根据编辑输出生成操作命令列表
         command_list = self._generate_commands(editor_output, content_schema, old_data)
 
+        # 调用 coder 执行操作命令，修改幻灯片内容。
         edit_actions = self.staffs["coder"](
             api_docs=code_executor.get_apis_docs(API_TYPES.Agent.value),
             edit_target=self.presentation.slides[template["template_id"] - 1].to_html(),
@@ -267,6 +283,7 @@ class PPTCrew(PPTGen):
         return edited_slide
 
     def _prepare_schema(self, content_schema: dict):
+        '''准备模板中的内容模式'''
         old_data = {}
         for el_name, el_info in content_schema.items():
             if el_info["type"] == "text":
@@ -291,6 +308,7 @@ class PPTCrew(PPTGen):
     def _generate_commands(
         self, editor_output: dict, content_schema: dict, old_data: dict, retry: int = 0
     ):
+        '''根据编辑输出和模板模式生成操作命令列表'''
         command_list = []
         try:
             for el_name, el_data in editor_output.items():

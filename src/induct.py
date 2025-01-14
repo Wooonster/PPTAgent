@@ -40,6 +40,7 @@ class SlideInducter:
         os.makedirs(self.output_dir, exist_ok=True)
 
     def layout_induct(self):
+        '''对幻灯片进行布局归纳，生成幻灯片的分类结构和模板'''
         if pexists(self.induct_cache):
             return json.load(open(self.induct_cache))
         content_slides_index, functional_cluster = self.category_split()
@@ -80,6 +81,7 @@ class SlideInducter:
         return self.slide_induction
 
     def category_split(self):
+        '''使用 语言模型 + prompt 将幻灯片分为功能性和内容性两类'''
         if pexists(self.split_cache):
             split = json.load(open(self.split_cache))
             return set(split["content_slides_index"]), split["functional_cluster"]
@@ -103,6 +105,11 @@ class SlideInducter:
         return content_slides_index, functional_cluster
 
     def layout_split(self, content_slides_index: set[int]):
+        '''进一步对内容性幻灯片进行布局归纳，基于布局和内容类型进行聚类
+        
+        按布局名称和内容类型, 将内容性幻灯片划分为多个子类;
+        使用图像余弦相似度对每个子类进行聚类
+        '''
         embeddings = get_image_embedding(self.template_image_folder, *self.image_models)
         assert len(embeddings) == len(self.prs)
         template = Template(open("prompts/ask_category.txt").read())
@@ -139,6 +146,10 @@ class SlideInducter:
 
     @tenacity
     def content_induct(self):
+        '''根据模板幻灯片提取内容模式
+        
+        遍历每类幻灯片的模板, 使用语言模型提取内容模式
+        '''
         self.slide_induction = self.layout_induct()
         content_induct_prompt = Template(open("prompts/content_induct.txt").read())
         for layout_name, cluster in self.slide_induction.items():

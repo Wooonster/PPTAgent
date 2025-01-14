@@ -19,25 +19,30 @@ from utils import runs_merge
 
 @dataclass
 class HistoryMark:
+    # API 调用结果
     API_CALL_ERROR = "api_call_error"
     API_CALL_CORRECT = "api_call_correct"
+    # 注释解析
     COMMENT_CORRECT = "comment_correct"
     COMMENT_ERROR = "comment_error"
+    # 代码执行
     CODE_RUN_ERROR = "code_run_error"
     CODE_RUN_CORRECT = "code_run_correct"
 
 
 class CodeExecutor:
+    '''管理 API 调用的历史记录、解析和执行操作代码，并提供辅助功能，如生成 API 文档'''
 
     def __init__(self, retry_times: int):
-        self.api_history = []
-        self.command_history = []
-        self.code_history = []
-        self.retry_times = retry_times
-        self.registered_functions = API_TYPES.all_funcs()
+        self.api_history = []  # api 调用历史
+        self.command_history = []  # 注释历史
+        self.code_history = []  # 代码执行历史
+        self.retry_times = retry_times  # 重试次数
+        self.registered_functions = API_TYPES.all_funcs()  # 加载可用 api 函数
         self.function_regex = re.compile(r"^[a-z]+_[a-z_]+\(.+\)")
-
+    
     def get_apis_docs(self, funcs: list[callable], show_example: bool = True):
+        '''生成 API 文档，展示所有注册函数的定义和文档字符串'''
         api_doc = []
         for func in funcs:
             sig = inspect.signature(func)
@@ -64,6 +69,7 @@ class CodeExecutor:
     def execute_actions(
         self, actions: str, edit_slide: SlidePage, found_code: bool = False
     ):
+        '''逐行解析并执行 API 调用代码块，记录状态并处理错误'''
         api_calls = actions.strip().split("\n")
         self.api_history.append(
             [HistoryMark.API_CALL_ERROR, edit_slide.slide_idx, actions]

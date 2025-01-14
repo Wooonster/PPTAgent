@@ -70,7 +70,7 @@ class LLM:
         self._use_openai = use_openai
         self._use_batch = use_batch
 
-    @tenacity
+    @tenacity  # 自动重试装饰器, 用于在请求失败时重试
     def __call__(
         self,
         content: str,
@@ -81,15 +81,21 @@ class LLM:
         return_json: bool = False,
         return_message: bool = False,
     ) -> str | dict | list:
+        '''分割 system_message 和 用户内容'''
         if content.startswith("You are"):
             system_message, content = content.split("\n", 1)
+        '''初始化历史对话'''
         if history is None:
             history = []
         if isinstance(images, str):
             images = [images]
+
         system, message = self.format_message(content, images, system_message)
-        if self._use_batch:
-            result = run_async(self._run_batch(system + history + message, delay_batch))
+
+        if self._use_batch:  # 批量模式 -> 异步发送请求并解析响应
+            result = run_async(
+                self._run_batch(system + history + message, delay_batch)
+            )
             if delay_batch:
                 return
             try:
@@ -99,12 +105,12 @@ class LLM:
             except Exception as e:
                 print("Failed to get response from batch")
                 raise e
-        elif self._use_openai:
+        elif self._use_openai:  # OpenAI 模式 -> 通过 OpenAI 客户端发送请求
             completion = self.client.chat.completions.create(
                 model=self.model, messages=system + history + message
             )
             response = completion.choices[0].message.content
-        else:
+        else:  # 自定义 API 模式 -> 使用 requests.post 发送请求。
             response = requests.post(
                 self.api_base,
                 json={
@@ -119,6 +125,7 @@ class LLM:
             )
             response.raise_for_status()
             response = response.text
+
         message.append({"role": "assistant", "content": response})
         if return_json:
             response = get_json_from_response(response)
@@ -145,6 +152,8 @@ class LLM:
         images: list[str] = None,
         system_message: str = None,
     ):
+        '''格式化用户输入和系统消息为符合 API 的消息结构'''
+
         if system_message is None:
             system_message = "You are a helpful assistant"
         system = [
@@ -153,7 +162,15 @@ class LLM:
                 "content": [{"type": "text", "text": system_message}],
             }
         ]
-        message = [{"role": "user", "content": [{"type": "text", "text": content}]}]
+        message = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": content}
+                ]
+            }
+        ]
+        '''附加图像，通过将图像编码为 Base64 字符串并附加到消息中'''
         if images is not None:
             if not isinstance(images, list):
                 images = [images]
@@ -163,13 +180,14 @@ class LLM:
                         {
                             "type": "image_url",
                             "image_url": {
-                                "url": f"data:image/jpeg;base64,{base64.b64encode(f.read()).decode('utf-8')}"
+                                "url": f"data:image/jpeg;base64, {base64.b64encode(f.read()).decode('utf-8')}"
                             },
                         }
                     )
         return system, message
 
     def get_batch_result(self):
+        '''在批量请求执行完成后，获取批量任务的结果，并提取响应内容'''
         results = run_async(self.oai_batch.run())
         return [
             r["choices"][0]["message"]["content"]
@@ -182,6 +200,7 @@ class LLM:
 
 @dataclass
 class Turn:
+    '''表示对话系统中用户和模型的一次交互（对话轮次）'''
     id: int
     prompt: str
     response: str
@@ -207,27 +226,30 @@ class Turn:
 class Role:
     def __init__(
         self,
-        name: str,
-        env: Environment,
-        record_cost: bool,
-        llm: LLM = None,
-        config: dict = None,
-        text_model: BGEM3FlagModel = None,
+        name: str,                          # 角色名称
+        env: Environment,                   # 模板渲染环境
+        record_cost: bool,                  # 是否记录 token 成本
+        llm: LLM = None,                    # LLM 对象
+        config: dict = None,                # 角色的配置字典
+        text_model: BGEM3FlagModel = None,  # 文本嵌入模型
     ):
         self.name = name
-        if config is None:
+        if config is None:  # 无，从 YAML 文件加载
             with open(f"roles/{name}.yaml", "r") as f:
                 config = yaml.safe_load(f)
-        if llm is None:
+        if llm is None:  # 无，从配置加载
             llm = globals()[config["use_model"] + "_model"]
         self.llm = llm
         self.model = llm.model
         self.record_cost = record_cost
         self.text_model = text_model
+
         self.return_json = config["return_json"]
         self.system_message = config["system_prompt"]
         self.prompt_args = set(config["jinja_args"])
         self.template = env.from_string(config["template"])
+
+        # 错误重试prompt
         self.retry_template = Template(
             """The previous output is invalid, please carefully analyze the traceback and feedback information, correct errors happened before.
             feedback:
@@ -243,6 +265,7 @@ class Role:
         self.history: list[Turn] = []
 
     def calc_cost(self, turns: list[Turn]):
+        '''计算输入和输出的总 token 数量，用于记录交互成本'''
         for turn in turns:
             self.input_tokens += turn.input_tokens
             self.output_tokens += turn.output_tokens
@@ -250,10 +273,13 @@ class Role:
         self.output_tokens += 3
 
     def get_history(self, similar: int, recent: int, prompt: str):
+        '''获取当前交互所需的对话历史'''
         history = self.history[-recent:] if recent > 0 else []
         if similar > 0:
             embedding = get_text_embedding(prompt, self.text_model)
-            history.sort(key=lambda x: cosine_similarity(embedding, x.embedding))
+            history.sort(
+                key=lambda x: cosine_similarity(embedding, x.embedding)
+            )
             for turn in history:
                 if len(history) > similar + recent:
                     break
@@ -263,6 +289,7 @@ class Role:
         return history
 
     def save_history(self, output_dir: str):
+        '''将对话历史保存到 JSONL 文件'''
         history_file = pjoin(output_dir, f"{self.name}.jsonl")
         if pexists(history_file) and len(self.history) == 0:
             return
@@ -277,6 +304,12 @@ class Role:
                 writer.write(turn.to_dict())
 
     def retry(self, feedback: str, traceback: str, error_idx: int):
+        '''对错误的对话轮次进行重试
+        
+        feedback  -> 错误的反馈信息。
+        traceback -> 错误的堆栈信息。
+        error_idx -> 重试的对话轮次索引
+        '''
         assert error_idx > 0, "error_idx must be greater than 0"
         prompt = self.retry_template.render(feedback=feedback, traceback=traceback)
         history = []
@@ -296,6 +329,7 @@ class Role:
         return self.__post_process__(response, self.history[-error_idx:], turn)
 
     def __repr__(self) -> str:
+        '''返回角色的字符串表示形式，便于调试和打印'''
         return f"Role(name={self.name}, model={self.model})"
 
     def __call__(
@@ -305,6 +339,7 @@ class Role:
         similar: int = 0,
         **jinja_args,
     ):
+        '''与 LLM 进行一次对话交互'''
         if isinstance(images, str):
             images = [images]
         assert self.prompt_args == set(jinja_args.keys()), "Invalid arguments"
@@ -333,12 +368,17 @@ class Role:
     def __post_process__(
         self, response: str, history: list[Turn], turn: Turn, similar: int = 0
     ):
+        '''对 LLM 响应进行后续处理'''
+        # 将新轮次加入历史
         self.history.append(turn)
         if similar > 0:
             turn.embedding = get_text_embedding(turn.prompt, self.text_model)
+
+        # 计算 token 数量
         if self.record_cost:
             turn.calc_token()
             self.calc_cost(history + [turn])
+        
         if self.return_json:
             response = get_json_from_response(response)
         return response
@@ -352,14 +392,11 @@ def get_simple_modelname(llms: list[LLM]):
 
 gpt4o = LLM(model="gpt-4o-2024-08-06", use_batch=True)
 gpt4omini = LLM(model="gpt-4o-mini-2024-07-18", use_batch=True)
-qwen2_5 = LLM(
-    model="Qwen2.5-72B-Instruct-GPTQ-Int4", api_base="http://124.16.138.143:7812/v1"
-)
 
+qwen2_5 = LLM(model="Qwen2.5-72B-Instruct-GPTQ-Int4", api_base="http://124.16.138.143:7812/v1")
 qwen_vl = LLM(model="Qwen2-VL-72B-Instruct", api_base="http://124.16.138.144:7999/v1")
-qwen_coder = LLM(
-    model="Qwen2.5-Coder-32B-Instruct", api_base="http://127.0.0.1:8008/v1"
-)
+qwen_coder = LLM(model="Qwen2.5-Coder-32B-Instruct", api_base="http://127.0.0.1:8008/v1")
+
 intern_vl = LLM(model="InternVL2_5-78B", api_base="http://124.16.138.144:8009/v1")
 
 language_model = qwen2_5

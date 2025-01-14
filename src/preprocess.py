@@ -32,6 +32,7 @@ device_count = torch.cuda.device_count()
 
 
 def rm_folder(folder: str):
+    '''递归删除文件夹及其内容'''
     try:
         shutil.rmtree(folder)
     except:
@@ -43,6 +44,7 @@ def rm_folder(folder: str):
 
 
 def process_filetype(file_type: str, func: callable, thread_num: int, topic="*"):
+    '''多线程处理特定文件类型的文件夹'''
     folders = glob.glob(f"data/{topic}/{file_type}/*")
     progress_bar = tqdm(total=len(folders), desc=f"processing {file_type}")
 
@@ -62,6 +64,7 @@ def process_filetype(file_type: str, func: callable, thread_num: int, topic="*")
 
 
 def parse_pdfs(pdf_folders: list[str], idx: int):
+    '''解析 PDF 文件内容，提取文本'''
     # require numpy==1.26.0, which is conflict with other packages
     from marker.models import create_model_dict
 
@@ -81,6 +84,7 @@ def parse_pdfs(pdf_folders: list[str], idx: int):
 
 
 def prepare_pdf_folder(pdf_folder: str, rank: int):
+    '''为 PDF 文件夹准备嵌入和描述'''
     image_model = get_image_model(f"cuda:{rank % device_count}")
     if not pexists(pjoin(pdf_folder, "source.md")):
         return
@@ -122,6 +126,7 @@ def prepare_pdf_folder(pdf_folder: str, rank: int):
 
 
 def filter_slide(slide: SlidePage):
+    '''筛选不符合条件的幻灯片, 根据幻灯片形状数量、图片数量等条件筛选, 过滤不必要的幻灯片，保留重要内容'''
     num_pictures = len(list(slide.shape_filter(Picture)))
     num_shapes = len(slide.shapes)
     if num_shapes > 10:
@@ -133,6 +138,7 @@ def filter_slide(slide: SlidePage):
 
 
 def check_consistency(slides: list[SlidePage], ppt_folder: str, image_model):
+    '''检查重建的幻灯片与原始幻灯片的一致性'''
     original_embeddings = get_image_embedding(
         pjoin(ppt_folder, "original_slides"), *image_model
     )
@@ -153,6 +159,7 @@ def check_consistency(slides: list[SlidePage], ppt_folder: str, image_model):
 
 
 def prepare_ppt_folder(ppt_folder: str, text_model: BGEM3FlagModel, image_model):
+    '''处理 PPT 文件夹，准备幻灯片的嵌入和描述'''
     if pexists(ppt_folder + "/source.pptx") or not older_than(
         ppt_folder + "/original.pptx"
     ):
@@ -196,6 +203,7 @@ def prepare_ppt_folder(ppt_folder: str, text_model: BGEM3FlagModel, image_model)
 
 
 def prepare_induction(induct_id: int, wait: bool = False):
+    '''准备演示文稿的内容归纳'''
     induct_llms = [
         (llms.qwen2_5, llms.qwen_vl),
         (llms.gpt4o, llms.gpt4o),
