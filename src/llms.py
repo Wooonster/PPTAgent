@@ -55,7 +55,7 @@ class LLM:
         self,
         model: str = "gpt-4o-2024-08-06",
         api_base: str = None,
-        use_openai: bool = True,
+        use_openai: bool = False,
         use_batch: bool = False,
     ) -> None:
         if use_openai and "OPENAI_API_KEY" in os.environ:
@@ -390,23 +390,26 @@ def get_simple_modelname(llms: list[LLM]):
     return "+".join(re.search(r"^(.*?)-\d{2}", llm.model).group(1) for llm in llms)
 
 
-gpt4o = LLM(model="gpt-4o-2024-08-06", use_batch=True)
-gpt4omini = LLM(model="gpt-4o-mini-2024-07-18", use_batch=True)
+# gpt4o = LLM(model="gpt-4o-2024-08-06", use_batch=True)
+# gpt4omini = LLM(model="gpt-4o-mini-2024-07-18", use_batch=True)
 
-qwen2_5 = LLM(model="Qwen2.5-72B-Instruct-GPTQ-Int4", api_base="http://124.16.138.143:7812/v1")
-qwen_vl = LLM(model="Qwen2-VL-72B-Instruct", api_base="http://124.16.138.144:7999/v1")
+qwen2_5 = LLM(model="Qwen2.5-72B-Instruct-GPTQ-Int4", api_base="http://127.0.0.1:7812/v1")
+qwen_vl = LLM(model="Qwen2-VL-72B-Instruct", api_base="http://127.0.0.1:7999/v1")
 qwen_coder = LLM(model="Qwen2.5-Coder-32B-Instruct", api_base="http://127.0.0.1:8008/v1")
 
-intern_vl = LLM(model="InternVL2_5-78B", api_base="http://124.16.138.144:8009/v1")
+intern_vl = LLM(model="InternVL2_5-78B", api_base="http://127.0.0.1:8009/v1")
 
 language_model = qwen2_5
 code_model = qwen2_5
 vision_model = qwen_vl
 
 if __name__ == "__main__":
-    gpt4o = LLM(model="gpt-4o-2024-08-06")
-    print(
-        gpt4o(
-            "who r u",
-        )
-    )
+    # gpt4o = LLM(model="gpt-4o-2024-08-06")
+    # print(
+    #     gpt4o(
+    #         "who r u",
+    #     )
+    # )
+
+    qwen2_5 = LLM(model="Qwen2.5-72B-Instruct-GPTQ-Int4", api_base="http://localhost:10001")
+    print(qwen2_5("who r u"))

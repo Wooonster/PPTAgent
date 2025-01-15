@@ -53,7 +53,7 @@ STAGES = [
 NUM_MODELS = 1 if len(sys.argv) == 1 else int(sys.argv[1])
 NUM_INSTANCES_PER_MODEL = 4
 DEVICE_COUNT = torch.cuda.device_count()
-REFINE_TEMPLATE = Template(open("prompts/document_refine.txt").read())
+REFINE_TEMPLATE = Template(open("../prompts/document_refine.txt").read())
 
 # models
 text_models = [
@@ -186,6 +186,8 @@ async def send_progress(websocket: WebSocket, status: str, progress: int):
 @app.websocket("/ws/{task_id}")
 async def websocket_endpoint(websocket: WebSocket, task_id: str):
     task_id = task_id.replace("|", "/")
+    logger.info(f"WebSocket connection attempt for task_id: {task_id}")
+    logger.info(f"Current progress_store keys: {list(progress_store.keys())}")
     if task_id in progress_store:
         await websocket.accept()
     else:
@@ -436,14 +438,16 @@ if __name__ == "__main__":
 
     import uvicorn
 
-    if len(sys.argv) == 1:
-        ppt_gen("2024-12-27|5215990c-9d9e-4f50-b7bc-d8633f072e6b", True)
-    ip = (
-        subprocess.check_output(
-            "hostname -I | tr ' ' '\n' | grep '^124\\.'", shell=True
-        )
-        .decode()
-        .strip()
-    )
-    print(f"backend running on {ip}:9297")
-    uvicorn.run(app, host=ip, port=9297)
+    # if len(sys.argv) == 1:
+        # ppt_gen("2024-12-27|5215990c-9d9e-4f50-b7bc-d8633f072e6b", True)
+
+    # ip = (
+    #     subprocess.check_output(
+    #         "hostname -I | tr ' ' '\n' | grep '^127\\.'", shell=True
+    #     )
+    #     .decode()
+    #     .strip()
+    # )
+    ip = '0.0.0.0'
+    print(f"backend running on {ip}:10001")
+    uvicorn.run(app, host=ip, port=10001)
