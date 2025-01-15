@@ -92,6 +92,17 @@ def parse_pdf(
 
 
 def get_text_embedding(text: list[str], model, batchsize: int = 32):
+    """
+    使用提供的模型生成文本嵌入。
+
+    参数:
+        text (list[str]): 要嵌入的字符串列表。如果提供单个字符串，它将被转换为列表。
+        model: 用于生成嵌入的模型。该模型应具有一个返回包含 "dense_vecs" 键的字典的 `encode` 方法。
+        batchsize (int, optional): 每个批次处理的文本数量。默认值为32。
+
+    返回:
+        list[torch.Tensor]: 包含每个输入文本嵌入的张量列表。
+    """
     if isinstance(text, str):
         return torch.tensor(model.encode(text)["dense_vecs"]).to(model.device)
     result = []

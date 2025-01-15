@@ -400,6 +400,7 @@ qwen_coder = LLM(model="Qwen2.5-Coder-32B-Instruct", api_base="http://127.0.0.1:
 intern_vl = LLM(model="InternVL2_5-78B", api_base="http://124.16.138.144:8009/v1")
 
 language_model = qwen2_5
+code_model = qwen2_5
 vision_model = qwen_vl
 
 if __name__ == "__main__":

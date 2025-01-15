@@ -46,8 +46,8 @@ class PPTGen(ABC):
         slide_induction: dict,        # 模版概括
     ):
         '''设置模板演示文稿和布局归纳结果
-        
         生成布局嵌入向量，用于后续的布局相似性比较'''
+        
         self.presentation = presentation
         self.slide_induction = slide_induction
         self.functional_keys = slide_induction.pop("functional_keys")
@@ -63,7 +63,7 @@ class PPTGen(ABC):
         config: Config,            # 配置信息
         images: dict[str, str],    # 图片
         num_slides: int,           # 幻灯片页面
-        doc_json: dict[str, str],  # 文档
+        doc_json: dict[str, str],  # 文档 json
     ):
         '''根据输入的内容和配置，生成完整的演示文稿'''
         self.config = config

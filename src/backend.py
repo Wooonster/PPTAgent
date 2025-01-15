@@ -207,34 +207,34 @@ def topic_generate(topic: str):
         + ", detail to 1000 words."
         + "Follow the format of the example output.\n"
         + """
-{
-    "title": "title of document",
-    "sections": [
-        {
-            "title": "title of section1",
-            "subsections": [
-                {
-                    "title": "title of subsection1.1",
-                    "content": "content of subsection1.1"
-                },
-                {
-                    "title": "title of subsection1.2",
-                    "content": "content of subsection1.2"
-                }
-            ]
-        },
-        {
-            "title": "title of section2",
-            "subsections": [
-                {
-                    "title": "title of subsection2.1",
-                    "content": "content of subsection2.1"
-                }
-            ]
-        }
-    ]
-}
-"""
+            {
+                "title": "title of document",
+                "sections": [
+                    {
+                        "title": "title of section1",
+                        "subsections": [
+                            {
+                                "title": "title of subsection1.1",
+                                "content": "content of subsection1.1"
+                            },
+                            {
+                                "title": "title of subsection1.2",
+                                "content": "content of subsection1.2"
+                            }
+                        ]
+                    },
+                    {
+                        "title": "title of section2",
+                        "subsections": [
+                            {
+                                "title": "title of subsection2.1",
+                                "content": "content of subsection2.1"
+                            }
+                        ]
+                    }
+                ]
+            }
+        """
     )
     text = llms.language_model(prompt, return_json=True)
     assert isinstance(text, dict), "Text is not in JSON format"
