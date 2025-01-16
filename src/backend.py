@@ -25,7 +25,14 @@ from fastapi import (
     WebSocket,
     WebSocketDisconnect,
 )
+# from fastapi.logger import logger
+
+import logging
 from fastapi.logger import logger
+
+# 设置日志级别为 INFO
+logging.basicConfig(level=logging.INFO)
+
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from FlagEmbedding import BGEM3FlagModel
@@ -203,6 +210,7 @@ async def websocket_endpoint(websocket: WebSocket, task_id: str):
 
 @tenacity
 def topic_generate(topic: str):
+    logger.info(f'topic recieved is: {topic}')
     prompt = (
         "Please generate a detailed presentation planning document about "
         + topic
@@ -239,6 +247,7 @@ def topic_generate(topic: str):
         """
     )
     text = llms.language_model(prompt, return_json=True)
+    logger.info(f"topic generate results: \n{text}")
     assert isinstance(text, dict), "Text is not in JSON format"
     return text
 
@@ -304,6 +313,7 @@ def ppt_gen(task_id: str, rerun=False):
         if not os.path.exists(pdf_dir + "/refined_doc.json"):
             os.makedirs(pdf_dir, exist_ok=True)
             json.dump(
+                # 按 topic 生成
                 topic_generate(task["pdf"]),
                 open(pjoin(pdf_dir, "refined_doc.json"), "w"),
             )

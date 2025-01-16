@@ -19,8 +19,14 @@ from torch import Tensor, cosine_similarity
 from model_utils import get_text_embedding
 from utils import get_json_from_response, pexists, pjoin, print, tenacity
 
-ENCODING = tiktoken.encoding_for_model("gpt-4o")
+import logging
+from fastapi.logger import logger
 
+# 设置日志级别为 INFO
+logging.basicConfig(level=logging.INFO)
+
+ENCODING = tiktoken.encoding_for_model("gpt-4o")
+os.environ['OPENAI_API_KEY'] = 'ollama'
 
 def run_async(coroutine):
     try:
@@ -55,16 +61,28 @@ class LLM:
         self,
         model: str = "gpt-4o-2024-08-06",
         api_base: str = None,
-        use_openai: bool = False,
+        use_openai: bool = True,
         use_batch: bool = False,
     ) -> None:
+        # if use_openai and "OPENAI_API_KEY" in os.environ:
+        #     self.client = OpenAI(base_url=api_base)
+        # if use_batch and "OPENAI_API_KEY" in os.environ:
+        #     assert use_openai, "use_batch must be used with use_openai"
+        #     self.oai_batch = Auto(loglevel=0)
+        # if "OPENAI_API_KEY" not in os.environ:
+        #     print("Warning: no API key found")
+
         if use_openai and "OPENAI_API_KEY" in os.environ:
-            self.client = OpenAI(base_url=api_base)
+            from openai import OpenAI  # 确保正确导入 OpenAI 类
+            self.client = OpenAI(base_url=api_base) if api_base else OpenAI()
+        else:
+            self.client = None  # 确保即使不使用 OpenAI，client 也被初始化
         if use_batch and "OPENAI_API_KEY" in os.environ:
             assert use_openai, "use_batch must be used with use_openai"
             self.oai_batch = Auto(loglevel=0)
         if "OPENAI_API_KEY" not in os.environ:
             print("Warning: no API key found")
+
         self.model = model
         self.api_base = api_base
         self._use_openai = use_openai
@@ -105,7 +123,7 @@ class LLM:
             except Exception as e:
                 print("Failed to get response from batch")
                 raise e
-        elif self._use_openai:  # OpenAI 模式 -> 通过 OpenAI 客户端发送请求
+        elif self._use_openai:  # OpenAI/Ollama 模式 
             completion = self.client.chat.completions.create(
                 model=self.model, messages=system + history + message
             )
@@ -127,8 +145,12 @@ class LLM:
             response = response.text
 
         message.append({"role": "assistant", "content": response})
+        
         if return_json:
+            # print(response)
+            logger.info(f'response before send back in LLM class:\n{response}')
             response = get_json_from_response(response)
+            logger.info(f'response after get_json_from_response in LLM class:\n{response}')
         if return_message:
             response = (response, message)
         return response
@@ -393,11 +415,12 @@ def get_simple_modelname(llms: list[LLM]):
 # gpt4o = LLM(model="gpt-4o-2024-08-06", use_batch=True)
 # gpt4omini = LLM(model="gpt-4o-mini-2024-07-18", use_batch=True)
 
-qwen2_5 = LLM(model="Qwen2.5-72B-Instruct-GPTQ-Int4", api_base="http://127.0.0.1:7812/v1")
-qwen_vl = LLM(model="Qwen2-VL-72B-Instruct", api_base="http://127.0.0.1:7999/v1")
-qwen_coder = LLM(model="Qwen2.5-Coder-32B-Instruct", api_base="http://127.0.0.1:8008/v1")
+# intern_vl = LLM(model="InternVL2_5-78B", api_base="http://127.0.0.1:8009/v1")
 
-intern_vl = LLM(model="InternVL2_5-78B", api_base="http://127.0.0.1:8009/v1")
+
+qwen2_5 = LLM(model="qwen2.5:1.5b", api_base="http://localhost:11434/v1/")  # api_base/key = 'ollama'
+qwen_vl = LLM(model="Qwen2-VL-2B-Instruct-GPTQ-Int4", api_base="http://localhost:8000/v1")  # openai_api_key = "EMPTY"
+qwen_coder = LLM(model="Qwen/Qwen2.5-Coder-1.5B-Instruct-GPTQ-Int4", api_base="http://127.0.0.1:8008/v1")
 
 language_model = qwen2_5
 code_model = qwen2_5
@@ -411,5 +434,5 @@ if __name__ == "__main__":
     #     )
     # )
 
-    qwen2_5 = LLM(model="Qwen2.5-72B-Instruct-GPTQ-Int4", api_base="http://localhost:10001")
+    qwen2_5 = LLM(model="qwen2.5:1.5b", api_base="http://localhost:11434/v1/")
     print(qwen2_5("who r u"))

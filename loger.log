@@ -1,0 +1,444 @@
+root@autodl-container-1a244d9c2a-1a276427:~/autodl-tmp/PPTAgent/src# python backend.py 
+INFO:datasets:PyTorch version 2.5.1 available.
+Fetching 30 files: 100%|██████████████████████████████████████████████████████████████████████████████████████| 30/30 [00:00<00:00, 117159.33it/s]
+INFO:FlagEmbedding.BGE_M3.modeling:loading existing colbert_linear and sparse_linear---------
+/root/miniconda3/lib/python3.12/site-packages/FlagEmbedding/BGE_M3/modeling.py:335: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  colbert_state_dict = torch.load(os.path.join(model_dir, 'colbert_linear.pt'), map_location='cpu')
+/root/miniconda3/lib/python3.12/site-packages/FlagEmbedding/BGE_M3/modeling.py:336: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sparse_state_dict = torch.load(os.path.join(model_dir, 'sparse_linear.pt'), map_location='cpu')
+/root/miniconda3/lib/python3.12/site-packages/transformers/models/vit/feature_extraction_vit.py:28: FutureWarning: The class ViTFeatureExtractor is deprecated and will be removed in version 5 of Transformers. Please use ViTImageProcessor instead.
+  warnings.warn(
+Loaded layout model datalab-to/surya_layout on device cuda with dtype torch.float16
+Loaded texify model to cuda with torch.float16 dtype
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.48, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+Loaded recognition model vikp/surya_rec2 on device cuda with dtype torch.float16
+Loaded table recognition model vikp/surya_tablerec on device cuda with dtype torch.float16
+Loaded detection model vikp/surya_det3 on device cuda with dtype torch.float16
+backend running on 0.0.0.0:10001
+INFO:     Started server process [872696]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:10001 (Press CTRL+C to quit)
+INFO:     127.0.0.1:53912 - "GET / HTTP/1.1" 200 OK
+INFO:fastapi:task created: 2025-01-16/48fa79cd-5d22-43e7-9313-e79c628ffba2
+INFO:     127.0.0.1:53898 - "POST /api/upload HTTP/1.1" 200 OK
+INFO:fastapi:WebSocket connection attempt for task_id: 2025-01-16/48fa79cd-5d22-43e7-9313-e79c628ffba2
+INFO:fastapi:Current progress_store keys: ['2025-01-16/48fa79cd-5d22-43e7-9313-e79c628ffba2']
+INFO:     ('127.0.0.1', 43796) - "WebSocket /ws/2025-01-16%7C48fa79cd-5d22-43e7-9313-e79c628ffba2" [accepted]
+INFO:     connection open
+INFO:fastapi:topic recieved is: introduce qwen2.5
+INFO:httpx:HTTP Request: POST http://localhost:11434/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:fastapi:response before send back in LLM class:
+{
+    "title": "Introduction Qwen2.5: A New Paradigm in Natural Language Generation",
+    "sections": [
+        {
+            "title": "I. Introduction to Qwen2.5 Architecture",
+            "subsections": [
+                {
+                    "title": "1. Overview of Qwen2.5 System",
+                    "content": "Qwen2.5 represents a revolutionary advancement in the field of natural language generation (NLG). This chapter delves into the fundamental design principles and architecture of this cutting-edge system, which is capable of synthesizing comprehensive and contextually accurate responses."
+                },
+                {
+                    "title": "2. Key Components of Qwen2.5",
+                    "content": "At its core, Qwen2.5 comprises a sophisticated combination of advanced AI models, specifically tailored for the nuanced task of generating human-like text across various domains. This includes an integrated framework for sentence structure analysis and optimization to ensure coherent output."
+                },
+                {
+                    "title": "3. Deep Learning Mechanisms Behind Qwen2.5",
+                    "content": "The driving force behind this architecture is a suite of intricate algorithms that harness the power of deep learning, enabling Qwen2.5 to grasp complex relationships within text and convert them into grammatically correct and contextually relevant responses."
+                },
+                {
+                    "title": "4. Experimental Results on Performance Benchmarking",
+                    "content": "Through rigorous testing conducted across various real-world scenarios involving diverse datasets from different domains, Qwen2.5 surpasses standard NLG performance by a significant margin, demonstrating exceptional capability in handling tasks that require precise reasoning and nuanced communication."
+                }
+            ]
+        },
+        {
+            "title": "II. Enhancements and Innovations of Qwen2.5 Compared to Previous Versions",
+            "subsections": [
+                {
+                    "title": "1. Expanded Linguistic Capabilities",
+                    "content": "In comparison to its predecessors, the latest iteration of Qwen2.5 has broadened the scope of linguistic functionality significantly. It now supports a wide array of language-specific nuances like idioms and regionalisms, making it more versatile for users in various geographic regions."
+                },
+                {
+                    "title": "2. Integration with Existing Systems",
+                    "content": "Enhancing system compatibility, Qwen2.5 seamlessly interacts with other software applications, allowing for a fully integrated toolkit that accelerates productivity and saves time significantly."
+                },
+                {
+                    "title": "3. Faster Response Times without Quality Sacrifice",
+                    "content": "One of the notable enhancements in Qwen2.5’s performance is its ability to process requests at lightning-fast speeds without compromising on quality or accuracy, providing unmatched value for users who require immediate responses and accurate information.”
+                },
+                {
+                    "title": "4. Enhanced Accessibility and Integration",
+                    "content": "For those seeking accessibility and ease of use, Qwen2.5 now boasts an intuitive user interface with features designed to make the entire process as simple and effective as possible."
+                }
+            ]
+        },
+        {
+            "title": "III. The Evolution of Communication and Future Trends in NLG",
+            "subsections": [
+                {
+                    "title": "1. Shift Towards Interactive Dialogues",
+                    "content": "In response to the increasing complexity of user interactions, Qwen2.5 is paving the way for a seamless transition towards interactive dialogues where understanding individual preferences can be further refined with each conversation."
+                },
+                {
+                    "title": "2. Artificial Intelligence in Creative Applications",
+                    "content": "As AI technology matures, it’s anticipated that applications beyond NLG will increasingly integrate Qwen2.5's capabilities into creative fields like narrative writing, poetry generation, and even music composition, showing a promising future of artistic expression powered by cutting-edge AI models."
+                },
+                {
+                    "title": "3. Ethical Considerations",
+                    "content": "Framing ethical concerns in an age where advanced linguistic tools are available is becoming crucial. While research shows the potential to enhance communication across different languages, there’s a growing necessity for developers to think ahead and address these issues through robust code reviews and continuous learning."
+                }
+            ]
+        },
+        {
+            "title": "IV. Real-world Applications of Qwen2.5",
+            "subsections": [
+                {
+                    "title": "1. Product Descriptions and Marketing Materials",
+                    "content": "From consumer goods to software development, companies can leverage Qwen2.5's AI-generated product descriptions for immediate improvements in their marketing materials, boosting engagement through captivating information."
+                },
+                {
+                    "title": "Education and Research Facilities",
+                    "content": "In the education sector, where knowledge is rapidly evolving across disciplines, NLG plays a pivotal role in enhancing teaching aids and research papers. Qwen2.5 offers educational advantages by producing coherent AI-enhanced documents that educate students with higher accuracy."
+                },
+                {
+                    "title": "News Reporting and Media Publications",
+                    "content": "With timely updates and varied news content expected to see substantial benefits, the integration of Qwen2.5 into media houses ensures precise translations and contextually relevant articles, significantly improving reader experience.”
+                }
+            ]
+        },
+        {
+            "title": "V. Deployment Considerations of Qwen2.5",
+            "subsections": [
+                {
+                    "title": "1. Initial Setup and Training Costs",
+                    "content": "Once installed, maintaining the system requires minimal effort from technical teams due to the automatic integration with existing tech infrastructure. However, initial setup costs can be substantial, highlighting the importance of thorough planning and financial assessment."
+                },
+                {
+                    "title": "2. Integration Phases into Existing Infrastructures",
+                    "content": "Qwen2.5’s compatibility across different tech environments makes it easy to integrate effectively within existing systems without jeopardizing core operations.”
+                }
+            ]
+        }
+    ],
+    "conclusion": "In summary, Qwen2.5 emerges as a pivotal development in the evolution of language technology and beyond. The groundbreaking architecture not only raises the bar for NLG but paves the way for new applications that were once the realm of science fiction."
+}
+INFO:fastapi:response after get_json_from_response in LLM class:
+{'title': 'Introduction Qwen2.5: A New Paradigm in Natural Language Generation', 'sections': [{'title': 'I. Introduction to Qwen2.5 Architecture', 'subsections': [{'title': '1. Overview of Qwen2.5 System', 'content': 'Qwen2.5 represents a revolutionary advancement in the field of natural language generation (NLG). This chapter delves into the fundamental design principles and architecture of this cutting-edge system, which is capable of synthesizing comprehensive and contextually accurate responses.'}, {'title': '2. Key Components of Qwen2.5', 'content': 'At its core, Qwen2.5 comprises a sophisticated combination of advanced AI models, specifically tailored for the nuanced task of generating human-like text across various domains. This includes an integrated framework for sentence structure analysis and optimization to ensure coherent output.'}, {'title': '3. Deep Learning Mechanisms Behind Qwen2.5', 'content': 'The driving force behind this architecture is a suite of intricate algorithms that harness the power of deep learning, enabling Qwen2.5 to grasp complex relationships within text and convert them into grammatically correct and contextually relevant responses.'}, {'title': '4. Experimental Results on Performance Benchmarking', 'content': 'Through rigorous testing conducted across various real-world scenarios involving diverse datasets from different domains, Qwen2.5 surpasses standard NLG performance by a significant margin, demonstrating exceptional capability in handling tasks that require precise reasoning and nuanced communication.'}]}, {'title': 'II. Enhancements and Innovations of Qwen2.5 Compared to Previous Versions', 'subsections': [{'title': '1. Expanded Linguistic Capabilities', 'content': 'In comparison to its predecessors, the latest iteration of Qwen2.5 has broadened the scope of linguistic functionality significantly. It now supports a wide array of language-specific nuances like idioms and regionalisms, making it more versatile for users in various geographic regions.'}, {'title': '2. Integration with Existing Systems', 'content': 'Enhancing system compatibility, Qwen2.5 seamlessly interacts with other software applications, allowing for a fully integrated toolkit that accelerates productivity and saves time significantly.'}, {'title': '3. Faster Response Times without Quality Sacrifice', 'content': 'One of the notable enhancements in Qwen2.5’s performance is its ability to process requests at lightning-fast speeds without compromising on quality or accuracy'}, {}, {'title': '4. Enhanced Accessibility and Integration', 'content': 'For those seeking accessibility and ease of use, Qwen2.5 now boasts an intuitive user interface with features designed to make the entire process as simple and effective as possible.'}]}, {'title': 'III. The Evolution of Communication and Future Trends in NLG', 'subsections': [{'title': '1. Shift Towards Interactive Dialogues', 'content': 'In response to the increasing complexity of user interactions, Qwen2.5 is paving the way for a seamless transition towards interactive dialogues where understanding individual preferences can be further refined with each conversation.'}, {'title': '2. Artificial Intelligence in Creative Applications', 'content': "As AI technology matures, it’s anticipated that applications beyond NLG will increasingly integrate Qwen2.5's capabilities into creative fields like narrative writing, poetry generation, and even music composition, showing a promising future of artistic expression powered by cutting-edge AI models."}, {'title': '3. Ethical Considerations', 'content': 'Framing ethical concerns in an age where advanced linguistic tools are available is becoming crucial. While research shows the potential to enhance communication across different languages, there’s a growing necessity for developers to think ahead and address these issues through robust code reviews and continuous learning.'}]}, {'title': 'IV. Real-world Applications of Qwen2.5', 'subsections': [{'title': '1. Product Descriptions and Marketing Materials', 'content': "From consumer goods to software development, companies can leverage Qwen2.5's AI-generated product descriptions for immediate improvements in their marketing materials, boosting engagement through captivating information."}, {'title': 'Education and Research Facilities', 'content': 'In the education sector, where knowledge is rapidly evolving across disciplines, NLG plays a pivotal role in enhancing teaching aids and research papers. Qwen2.5 offers educational advantages by producing coherent AI-enhanced documents that educate students with higher accuracy.'}, {'title': 'News Reporting and Media Publications', 'content': 'With timely updates and varied news content expected to see substantial benefits'}, {}]}, {'title': 'V. Deployment Considerations of Qwen2.5', 'subsections': [{'title': '1. Initial Setup and Training Costs', 'content': 'Once installed, maintaining the system requires minimal effort from technical teams due to the automatic integration with existing tech infrastructure. However, initial setup costs can be substantial, highlighting the importance of thorough planning and financial assessment.'}, {'title': '2. Integration Phases into Existing Infrastructures', 'content': 'Qwen2.5’s compatibility across different tech environments makes it easy to integrate effectively within existing systems without jeopardizing core operations.”'}]}], 'conclusion': 'In summary, Qwen2.5 emerges as a pivotal development in the evolution of language technology and beyond. The groundbreaking architecture not only raises the bar for NLG but paves the way for new applications that were once the realm of science fiction.'}
+INFO:fastapi:topic generate results: 
+{'title': 'Introduction Qwen2.5: A New Paradigm in Natural Language Generation', 'sections': [{'title': 'I. Introduction to Qwen2.5 Architecture', 'subsections': [{'title': '1. Overview of Qwen2.5 System', 'content': 'Qwen2.5 represents a revolutionary advancement in the field of natural language generation (NLG). This chapter delves into the fundamental design principles and architecture of this cutting-edge system, which is capable of synthesizing comprehensive and contextually accurate responses.'}, {'title': '2. Key Components of Qwen2.5', 'content': 'At its core, Qwen2.5 comprises a sophisticated combination of advanced AI models, specifically tailored for the nuanced task of generating human-like text across various domains. This includes an integrated framework for sentence structure analysis and optimization to ensure coherent output.'}, {'title': '3. Deep Learning Mechanisms Behind Qwen2.5', 'content': 'The driving force behind this architecture is a suite of intricate algorithms that harness the power of deep learning, enabling Qwen2.5 to grasp complex relationships within text and convert them into grammatically correct and contextually relevant responses.'}, {'title': '4. Experimental Results on Performance Benchmarking', 'content': 'Through rigorous testing conducted across various real-world scenarios involving diverse datasets from different domains, Qwen2.5 surpasses standard NLG performance by a significant margin, demonstrating exceptional capability in handling tasks that require precise reasoning and nuanced communication.'}]}, {'title': 'II. Enhancements and Innovations of Qwen2.5 Compared to Previous Versions', 'subsections': [{'title': '1. Expanded Linguistic Capabilities', 'content': 'In comparison to its predecessors, the latest iteration of Qwen2.5 has broadened the scope of linguistic functionality significantly. It now supports a wide array of language-specific nuances like idioms and regionalisms, making it more versatile for users in various geographic regions.'}, {'title': '2. Integration with Existing Systems', 'content': 'Enhancing system compatibility, Qwen2.5 seamlessly interacts with other software applications, allowing for a fully integrated toolkit that accelerates productivity and saves time significantly.'}, {'title': '3. Faster Response Times without Quality Sacrifice', 'content': 'One of the notable enhancements in Qwen2.5’s performance is its ability to process requests at lightning-fast speeds without compromising on quality or accuracy'}, {}, {'title': '4. Enhanced Accessibility and Integration', 'content': 'For those seeking accessibility and ease of use, Qwen2.5 now boasts an intuitive user interface with features designed to make the entire process as simple and effective as possible.'}]}, {'title': 'III. The Evolution of Communication and Future Trends in NLG', 'subsections': [{'title': '1. Shift Towards Interactive Dialogues', 'content': 'In response to the increasing complexity of user interactions, Qwen2.5 is paving the way for a seamless transition towards interactive dialogues where understanding individual preferences can be further refined with each conversation.'}, {'title': '2. Artificial Intelligence in Creative Applications', 'content': "As AI technology matures, it’s anticipated that applications beyond NLG will increasingly integrate Qwen2.5's capabilities into creative fields like narrative writing, poetry generation, and even music composition, showing a promising future of artistic expression powered by cutting-edge AI models."}, {'title': '3. Ethical Considerations', 'content': 'Framing ethical concerns in an age where advanced linguistic tools are available is becoming crucial. While research shows the potential to enhance communication across different languages, there’s a growing necessity for developers to think ahead and address these issues through robust code reviews and continuous learning.'}]}, {'title': 'IV. Real-world Applications of Qwen2.5', 'subsections': [{'title': '1. Product Descriptions and Marketing Materials', 'content': "From consumer goods to software development, companies can leverage Qwen2.5's AI-generated product descriptions for immediate improvements in their marketing materials, boosting engagement through captivating information."}, {'title': 'Education and Research Facilities', 'content': 'In the education sector, where knowledge is rapidly evolving across disciplines, NLG plays a pivotal role in enhancing teaching aids and research papers. Qwen2.5 offers educational advantages by producing coherent AI-enhanced documents that educate students with higher accuracy.'}, {'title': 'News Reporting and Media Publications', 'content': 'With timely updates and varied news content expected to see substantial benefits'}, {}]}, {'title': 'V. Deployment Considerations of Qwen2.5', 'subsections': [{'title': '1. Initial Setup and Training Costs', 'content': 'Once installed, maintaining the system requires minimal effort from technical teams due to the automatic integration with existing tech infrastructure. However, initial setup costs can be substantial, highlighting the importance of thorough planning and financial assessment.'}, {'title': '2. Integration Phases into Existing Infrastructures', 'content': 'Qwen2.5’s compatibility across different tech environments makes it easy to integrate effectively within existing systems without jeopardizing core operations.”'}]}], 'conclusion': 'In summary, Qwen2.5 emerges as a pivotal development in the evolution of language technology and beyond. The groundbreaking architecture not only raises the bar for NLG but paves the way for new applications that were once the realm of science fiction.'}
+Warning in slide 1 of runs/pptx/c59083cca30f552ab68223293b5a4527/source.pptx: Traceback (most recent call last):
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 815, in from_file
+    SlidePage.from_slide(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 671, in from_slide
+    ShapeElement.from_shape(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 211, in from_shape
+    obj = SHAPECAST.get(shape.shape_type, UnsupportedShape).from_shape(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 520, in from_shape
+    ShapeElement.from_shape(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 211, in from_shape
+    obj = SHAPECAST.get(shape.shape_type, UnsupportedShape).from_shape(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 339, in from_shape
+    raise ValueError(f"unsupported shape {shape.shape_type}")
+ValueError: unsupported shape FREEFORM (5)
+
+Warning in slide 2 of runs/pptx/c59083cca30f552ab68223293b5a4527/source.pptx: Traceback (most recent call last):
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 815, in from_file
+    SlidePage.from_slide(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 671, in from_slide
+    ShapeElement.from_shape(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 211, in from_shape
+    obj = SHAPECAST.get(shape.shape_type, UnsupportedShape).from_shape(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 520, in from_shape
+    ShapeElement.from_shape(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 211, in from_shape
+    obj = SHAPECAST.get(shape.shape_type, UnsupportedShape).from_shape(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 339, in from_shape
+    raise ValueError(f"unsupported shape {shape.shape_type}")
+ValueError: unsupported shape FREEFORM (5)
+
+Warning in slide 7 of runs/pptx/c59083cca30f552ab68223293b5a4527/source.pptx: Traceback (most recent call last):
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 815, in from_file
+    SlidePage.from_slide(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 671, in from_slide
+    ShapeElement.from_shape(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 211, in from_shape
+    obj = SHAPECAST.get(shape.shape_type, UnsupportedShape).from_shape(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 339, in from_shape
+    raise ValueError(f"unsupported shape {shape.shape_type}")
+ValueError: unsupported shape FREEFORM (5)
+
+Warning in slide 8 of runs/pptx/c59083cca30f552ab68223293b5a4527/source.pptx: Traceback (most recent call last):
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 815, in from_file
+    SlidePage.from_slide(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 671, in from_slide
+    ShapeElement.from_shape(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 211, in from_shape
+    obj = SHAPECAST.get(shape.shape_type, UnsupportedShape).from_shape(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 339, in from_shape
+    raise ValueError(f"unsupported shape {shape.shape_type}")
+ValueError: unsupported shape FREEFORM (5)
+
+Warning in slide 10 of runs/pptx/c59083cca30f552ab68223293b5a4527/source.pptx: Traceback (most recent call last):
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 815, in from_file
+    SlidePage.from_slide(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 671, in from_slide
+    ShapeElement.from_shape(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 211, in from_shape
+    obj = SHAPECAST.get(shape.shape_type, UnsupportedShape).from_shape(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 587, in from_shape
+    "shape_type": shape.auto_shape_type.real,
+                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/pptx/shapes/autoshape.py", line 279, in auto_shape_type
+    return self._sp.prst
+           ^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/pptx/oxml/shapes/autoshape.py", line 401, in prst
+    return prstGeom.prst
+           ^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/pptx/oxml/xmlchemy.py", line 250, in get_attr_value
+    return self._simple_type.from_xml(attr_str_value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/pptx/enum/base.py", line 85, in from_xml
+    raise ValueError(f"{cls.__name__} has no XML mapping for {repr(xml_value)}")
+ValueError: MSO_AUTO_SHAPE_TYPE has no XML mapping for 'line'
+
+Warning in slide 11 of runs/pptx/c59083cca30f552ab68223293b5a4527/source.pptx: Traceback (most recent call last):
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 815, in from_file
+    SlidePage.from_slide(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 671, in from_slide
+    ShapeElement.from_shape(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 211, in from_shape
+    obj = SHAPECAST.get(shape.shape_type, UnsupportedShape).from_shape(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 520, in from_shape
+    ShapeElement.from_shape(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 211, in from_shape
+    obj = SHAPECAST.get(shape.shape_type, UnsupportedShape).from_shape(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 520, in from_shape
+    ShapeElement.from_shape(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 211, in from_shape
+    obj = SHAPECAST.get(shape.shape_type, UnsupportedShape).from_shape(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 339, in from_shape
+    raise ValueError(f"unsupported shape {shape.shape_type}")
+ValueError: unsupported shape FREEFORM (5)
+
+Warning in slide 13 of runs/pptx/c59083cca30f552ab68223293b5a4527/source.pptx: Traceback (most recent call last):
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 815, in from_file
+    SlidePage.from_slide(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 671, in from_slide
+    ShapeElement.from_shape(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 211, in from_shape
+    obj = SHAPECAST.get(shape.shape_type, UnsupportedShape).from_shape(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 339, in from_shape
+    raise ValueError(f"unsupported shape {shape.shape_type}")
+ValueError: unsupported shape FREEFORM (5)
+
+Warning in slide 15 of runs/pptx/c59083cca30f552ab68223293b5a4527/source.pptx: Traceback (most recent call last):
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 815, in from_file
+    SlidePage.from_slide(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 671, in from_slide
+    ShapeElement.from_shape(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 211, in from_shape
+    obj = SHAPECAST.get(shape.shape_type, UnsupportedShape).from_shape(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 520, in from_shape
+    ShapeElement.from_shape(
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 211, in from_shape
+    obj = SHAPECAST.get(shape.shape_type, UnsupportedShape).from_shape(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/presentation.py", line 339, in from_shape
+    raise ValueError(f"unsupported shape {shape.shape_type}")
+ValueError: unsupported shape FREEFORM (5)
+
+<RetryCallState 139934530101152: attempt #1; slept for 0.0; last result: failed (FileNotFoundError [Errno 2] No such file or directory: 
+'soffice')>
+  File "/root/miniconda3/lib/python3.12/site-packages/tenacity/__init__.py", line 478, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/utils.py", line 155, in ppt_to_images
+    subprocess.run(command_list, check=True, stdout=subprocess.DEVNULL)
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+<RetryCallState 139934530101152: attempt #2; slept for 3.0; last result: failed (FileNotFoundError [Errno 2] No such file or directory: 
+'soffice')>
+  File "/root/miniconda3/lib/python3.12/site-packages/tenacity/__init__.py", line 478, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/utils.py", line 155, in ppt_to_images
+    subprocess.run(command_list, check=True, stdout=subprocess.DEVNULL)
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+<RetryCallState 139934530101152: attempt #3; slept for 6.0; last result: failed (FileNotFoundError [Errno 2] No such file or directory: 
+'soffice')>
+  File "/root/miniconda3/lib/python3.12/site-packages/tenacity/__init__.py", line 478, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/utils.py", line 155, in ppt_to_images
+    subprocess.run(command_list, check=True, stdout=subprocess.DEVNULL)
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+<RetryCallState 139934530101152: attempt #4; slept for 9.0; last result: failed (FileNotFoundError [Errno 2] No such file or directory: 
+'soffice')>
+  File "/root/miniconda3/lib/python3.12/site-packages/tenacity/__init__.py", line 478, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/utils.py", line 155, in ppt_to_images
+    subprocess.run(command_list, check=True, stdout=subprocess.DEVNULL)
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+<RetryCallState 139934530101152: attempt #5; slept for 12.0; last result: failed (FileNotFoundError [Errno 2] No such file or directory: 
+'soffice')>
+  File "/root/miniconda3/lib/python3.12/site-packages/tenacity/__init__.py", line 478, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/utils.py", line 155, in ppt_to_images
+    subprocess.run(command_list, check=True, stdout=subprocess.DEVNULL)
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+ERROR:fastapi:2025-01-16/48fa79cd-5d22-43e7-9313-e79c628ffba2: PPT Parsing Error: [Errno 2] No such file or directory: 'soffice'
+Traceback (most recent call last):
+  File "/root/autodl-tmp/PPTAgent/src/backend.py", line 344, in ppt_gen
+    ppt_to_images(pjoin(pptx_config.RUN_DIR, "source.pptx"), ppt_image_folder)
+  File "/root/miniconda3/lib/python3.12/site-packages/tenacity/__init__.py", line 336, in wrapped_f
+    return copy(f, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/tenacity/__init__.py", line 475, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/tenacity/__init__.py", line 376, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/tenacity/__init__.py", line 418, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/tenacity/__init__.py", line 185, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/root/miniconda3/lib/python3.12/site-packages/tenacity/__init__.py", line 478, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/root/autodl-tmp/PPTAgent/src/utils.py", line 155, in ppt_to_images
+    subprocess.run(command_list, check=True, stdout=subprocess.DEVNULL)
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/root/miniconda3/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'soffice'
+--- Logging error ---
+Traceback (most recent call last):
+  File "/root/autodl-tmp/PPTAgent/src/backend.py", line 205, in websocket_endpoint
+    data = await websocket.receive_text()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/site-packages/starlette/websockets.py", line 119, in receive_text
+    self._raise_on_disconnect(message)
+  File "/root/miniconda3/lib/python3.12/site-packages/starlette/websockets.py", line 113, in _raise_on_disconnect
+    raise WebSocketDisconnect(message["code"], message.get("reason"))
+starlette.websockets.WebSocketDisconnect: (<CloseCode.NO_STATUS_RCVD: 1005>, '')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/miniconda3/lib/python3.12/logging/__init__.py", line 1160, in emit
+    msg = self.format(record)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/logging/__init__.py", line 999, in format
+    return fmt.format(record)
+           ^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/logging/__init__.py", line 703, in format
+    record.message = record.getMessage()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/root/miniconda3/lib/python3.12/logging/__init__.py", line 392, in getMessage
+    msg = msg % self.args
+          ~~~~^~~~~~~~~~~
+TypeError: not all arguments converted during string formatting
+Call stack:
+  File "/root/autodl-tmp/PPTAgent/src/backend.py", line 463, in <module>
+    uvicorn.run(app, host=ip, port=10001)
+  File "/root/miniconda3/lib/python3.12/site-packages/uvicorn/main.py", line 579, in run
+    server.run()
+  File "/root/miniconda3/lib/python3.12/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+  File "/root/miniconda3/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+  File "/root/miniconda3/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/root/miniconda3/lib/python3.12/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 243, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)  # type: ignore[func-returns-value]
+  File "/root/miniconda3/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+  File "/root/miniconda3/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/root/miniconda3/lib/python3.12/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/miniconda3/lib/python3.12/site-packages/starlette/middleware/errors.py", line 152, in __call__
+    await self.app(scope, receive, send)
+  File "/root/miniconda3/lib/python3.12/site-packages/starlette/middleware/cors.py", line 77, in __call__
+    await self.app(scope, receive, send)
+  File "/root/miniconda3/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/root/miniconda3/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/miniconda3/lib/python3.12/site-packages/starlette/routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/miniconda3/lib/python3.12/site-packages/starlette/routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "/root/miniconda3/lib/python3.12/site-packages/starlette/routing.py", line 362, in handle
+    await self.app(scope, receive, send)
+  File "/root/miniconda3/lib/python3.12/site-packages/starlette/routing.py", line 95, in app
+    await wrap_app_handling_exceptions(app, session)(scope, receive, send)
+  File "/root/miniconda3/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/miniconda3/lib/python3.12/site-packages/starlette/routing.py", line 93, in app
+    await func(session)
+  File "/root/miniconda3/lib/python3.12/site-packages/fastapi/routing.py", line 383, in app
+    await dependant.call(**solved_result.values)
+  File "/root/autodl-tmp/PPTAgent/src/backend.py", line 207, in websocket_endpoint
+    logger.info("websocket disconnected", task_id)
+Message: 'websocket disconnected'
+Arguments: ('2025-01-16/48fa79cd-5d22-43e7-9313-e79c628ffba2',)
+INFO:     connection closed
+INFO:     127.0.0.1:42660 - "GET /api/download?task_id=2025-01-16%7C48fa79cd-5d22-43e7-9313-e79c628ffba2 HTTP/1.1" 404 Not Found
