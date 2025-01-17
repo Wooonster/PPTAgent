@@ -103,7 +103,7 @@ def prepare_pdf_folder(pdf_folder: str, rank: int):
                     break
         images = [image for image in images if pexists(image)]
         image_stats = {}
-        caption_prompt = open("prompts/caption.txt").read()
+        caption_prompt = open("../prompts/caption.txt").read()
         for image in images:
             image_stats[image] = llms.vision_model(caption_prompt, image)
             print(image_stats[image])
@@ -113,7 +113,7 @@ def prepare_pdf_folder(pdf_folder: str, rank: int):
     if not pexists(pjoin(pdf_folder, "refined_doc.json")):
         text_content = open(pjoin(pdf_folder, "source.md")).read()
         text_content = markdown_clean_pattern.sub("", text_content)
-        template = Template(open("prompts/document_refine.txt").read())
+        template = Template(open("../prompts/document_refine.txt").read())
         doc_json = llms.language_model(
             template.render(markdown_document=text_content), return_json=True
         )

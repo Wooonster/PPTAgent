@@ -19,6 +19,11 @@ from model_utils import get_text_embedding
 from presentation import Presentation, SlidePage
 from utils import Config, get_slide_content, pexists, pjoin, tenacity
 
+import logging
+from fastapi.logger import logger
+
+# 设置日志级别为 INFO
+logging.basicConfig(level=logging.INFO)
 
 @dataclass
 class PPTGen(ABC):
@@ -51,6 +56,7 @@ class PPTGen(ABC):
         self.presentation = presentation
         self.slide_induction = slide_induction
         self.functional_keys = slide_induction.pop("functional_keys")
+        logger.info(f'--- slide_induction in PPTGen.set_examplar ---:\n--- {slide_induction}')
         self.layout_names = list(slide_induction.keys())
         self.layout_embeddings = torch.stack(
             get_text_embedding(self.layout_names, self.text_model)
@@ -62,7 +68,7 @@ class PPTGen(ABC):
         self,
         config: Config,            # 配置信息
         images: dict[str, str],    # 图片
-        num_slides: int,           # 幻灯片页面
+        num_slides: int,           # 幻灯片页数量
         doc_json: dict[str, str],  # 文档 json
     ):
         '''根据输入的内容和配置，生成完整的演示文稿'''
@@ -127,8 +133,10 @@ class PPTGen(ABC):
         '''根据文档内容生成幻灯片的大纲'''
         outline_file = pjoin(self.config.RUN_DIR, "presentation_outline.json")
         doc_overview = deepcopy(self.doc_json)
+        logger.info(f' -- doc_overview in pptgen._generate_outline is:\n{doc_overview}')
         for section in doc_overview["sections"]:
-            [sub.pop("content") for sub in section["subsections"]]
+            # [sub.pop("content") for sub in section["subsections"]]
+            [sub.pop("content") for sub in section["subsections"] if "content" in sub]
         if pexists(outline_file):
             outline = json.load(open(outline_file, "r"))
         else:
@@ -159,7 +167,8 @@ class PPTGen(ABC):
                     get_text_embedding(slide["layout"], self.text_model),
                     self.layout_embeddings,
                 )
-                if layout_sim.max() < 0.7:
+                if layout_sim.max() < 0.4:
+                    logger.info(f' -- layout_sim.max() between slide["layout"]->{slide["layout"]} and self.layout_embeddings == {layout_sim.max()}')
                     raise ValueError(
                         f"Layout `{slide['layout']}` not found, must be one of {self.layout_names}"
                     )
@@ -235,7 +244,6 @@ class PPTGen(ABC):
             print(self.config.RUN_DIR)
 
 
-# 价格scale factor
 class PPTCrew(PPTGen):
     roles: list[str] = ["editor", "coder"]
 
@@ -247,8 +255,11 @@ class PPTCrew(PPTGen):
         images_info: str,
     ) -> SlidePage:
         '''根据模板和内容生成单张幻灯片'''
+        logger.info(f' -- template is:\n{template}')
         content_schema = template["content_schema"]
+        logger.info(f' -- content_schema=template["content_schema"] is:\n{content_schema}')
         old_data = self._prepare_schema(content_schema)
+        logger.info(f' -- old data is:\n{old_data}')
         # 调用 editor 角色生成编辑输出
         editor_output = self.staffs["editor"](
             schema=content_schema,
@@ -257,6 +268,7 @@ class PPTCrew(PPTGen):
             text=slide_content,
             images_info=images_info,
         )
+        logger.info(f' -- editor role output is:\n{editor_output}')
 
         # 根据编辑输出生成操作命令列表
         command_list = self._generate_commands(editor_output, content_schema, old_data)
@@ -283,8 +295,9 @@ class PPTCrew(PPTGen):
         return edited_slide
 
     def _prepare_schema(self, content_schema: dict):
-        '''准备模板中的内容模式'''
+        # '''准备模板中的内容模式'''
         old_data = {}
+        logger.info(f' -- content_schema in PPTCrew._prepare_schema is:\n{content_schema}')
         for el_name, el_info in content_schema.items():
             if el_info["type"] == "text":
                 if not isinstance(el_info["data"], list):
@@ -304,14 +317,19 @@ class PPTCrew(PPTGen):
                 content_schema[el_name]["default_quantity"] = len(old_data[el_name])
         assert len(old_data) > 0, "No old data generated"
         return old_data
-
+    
+    
     def _generate_commands(
         self, editor_output: dict, content_schema: dict, old_data: dict, retry: int = 0
     ):
         '''根据编辑输出和模板模式生成操作命令列表'''
         command_list = []
+
         try:
+            logger.info(' -- in _generate_commands loop -')
             for el_name, el_data in editor_output.items():
+                logger.info(f' -- el_name: {el_name} --')
+                logger.info(f' -- el_data:\n{el_data} --')
                 assert (
                     "data" in el_data
                 ), """key `data` not found in output

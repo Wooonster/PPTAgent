@@ -30,8 +30,8 @@ class ImageLabler:
                 shape.caption = stats["caption"]
 
     def caption_images(self):
-        '''用 vllm 为没有描述的图片生成描述'''
-        caption_prompt = open("prompts/caption.txt").read()
+        '''用 vlm 为没有描述的图片生成描述'''
+        caption_prompt = open("../prompts/caption.txt").read()
         for image, stats in self.image_stats.items():
             if "caption" not in stats:
                 stats["caption"] = llms.vision_model(

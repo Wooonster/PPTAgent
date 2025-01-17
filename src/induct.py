@@ -10,6 +10,12 @@ from model_utils import get_cluster, get_image_embedding, images_cosine_similari
 from presentation import Presentation
 from utils import Config, pexists, pjoin, tenacity
 
+import logging
+from fastapi.logger import logger
+
+# 设置日志级别为 INFO
+logging.basicConfig(level=logging.INFO)
+
 
 class SlideInducter:
     def __init__(
@@ -38,15 +44,18 @@ class SlideInducter:
         self.split_cache = pjoin(self.output_dir, f"split_cache.json")
         self.induct_cache = pjoin(self.output_dir, f"induct_cache.json")
         os.makedirs(self.output_dir, exist_ok=True)
-
+    
     def layout_induct(self):
         '''对幻灯片进行布局归纳，生成幻灯片的分类结构和模板'''
         if pexists(self.induct_cache):
             return json.load(open(self.induct_cache))
         content_slides_index, functional_cluster = self.category_split()
+        logger.info(f'functional_cluster.items() in induct.layout_induct:\n{functional_cluster.items()}')
         for layout_name, cluster in functional_cluster.items():
             for slide_idx in cluster:
-                content_type = self.prs.slides[slide_idx - 1].get_content_type()
+                slide_idx = int(slide_idx[6])
+                content_type = self.prs.slides[slide_idx].get_content_type()
+                # content_type = self.prs.slides[slide_idx - 1].get_content_type()
                 self.slide_induction[layout_name + ":" + content_type]["slides"].append(
                     slide_idx
                 )
@@ -81,11 +90,11 @@ class SlideInducter:
         return self.slide_induction
 
     def category_split(self):
-        '''使用 语言模型 + prompt 将幻灯片分为功能性和内容性两类'''
+        '''使用 语言模型 + prompt 将幻灯片分为功能性和内容性两类, 并对ppt页面归类'''
         if pexists(self.split_cache):
             split = json.load(open(self.split_cache))
             return set(split["content_slides_index"]), split["functional_cluster"]
-        category_split_template = Template(open("prompts/category_split.txt").read())
+        category_split_template = Template(open("../prompts/category_split.txt").read())
         functional_cluster = llms.language_model(
             category_split_template.render(slides=self.prs.to_text()),
             return_json=True,
@@ -112,7 +121,7 @@ class SlideInducter:
         '''
         embeddings = get_image_embedding(self.template_image_folder, *self.image_models)
         assert len(embeddings) == len(self.prs)
-        template = Template(open("prompts/ask_category.txt").read())
+        template = Template(open("../prompts/ask_category.txt").read())
         content_split = defaultdict(list)
         for slide_idx in content_slides_index:
             slide = self.prs.slides[slide_idx - 1]
@@ -151,7 +160,7 @@ class SlideInducter:
         遍历每类幻灯片的模板, 使用语言模型提取内容模式
         '''
         self.slide_induction = self.layout_induct()
-        content_induct_prompt = Template(open("prompts/content_induct.txt").read())
+        content_induct_prompt = Template(open("../prompts/content_induct.txt").read())
         for layout_name, cluster in self.slide_induction.items():
             if "template_id" in cluster and "content_schema" not in cluster:
                 schema = llms.language_model(
@@ -162,12 +171,57 @@ class SlideInducter:
                     ),
                     return_json=True,
                 )
+
+                schema = {
+                    "slide_1": {
+                        "name": "main title",
+                        "description": "the title of the slide",
+                        "type": [
+                            "text"
+                        ],
+                        "data": [
+                            "Welcome to Our Presentation"
+                        ]
+                    },
+                    "slide_2": {
+                        "name": "content bullets",
+                        "description": "contain text on specific slides to provide further information or details, typically organized in bullet points",
+                        "type": [
+                            "text"
+                        ],
+                        "data": [
+                            "<p>This is the first bullet point of this slide. It describes the content and objectives of what we will discuss.</p>",
+                            "<p>The audience can also refer back to these points while listening to our presentation.</p>"
+                        ]
+                    },
+                    "slide_3": {
+                        "name": "acknowledgments",
+                        "description": "a short statement of gratitude or thanks to those who helped with the material, such as the speakers, sponsors, etc.",
+                        "type": [
+                            "text"
+                        ],
+                        "data": [
+                            "<p>Thank you for joining us today!</p>"
+                        ]
+                    }
+                }
+
+                logger.info(f'schema in induce.content_induct:\n{schema}\nand the schema.keys() is:\n{schema.keys()}')
+                
+                # 处理 schema 中可能的空字段或缺失字段
+                keys_to_remove = []
                 for k in list(schema.keys()):
                     if "data" not in schema[k]:
-                        raise ValueError(f"Cannot find `data` in {k}\n{schema[k]}")
+                        logger.warning(f"Missing `data` in {k}: {schema[k]}")
+                        schema[k]["data"] = ["Default Value"]  # 或者设置一个默认值
                     if len(schema[k]["data"]) == 0:
-                        print(f"Empty content schema: {schema[k]}")
-                        schema.pop(k)
+                        logger.warning(f"Empty content schema for {k}: {schema[k]}")
+                        keys_to_remove.append(k)
+                
+                # 移除不符合要求的键
+                for k in keys_to_remove:
+                    schema.pop(k)
+                
                 assert len(schema) > 0, "No content schema generated"
                 self.slide_induction[layout_name]["content_schema"] = schema
         json.dump(

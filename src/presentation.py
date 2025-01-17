@@ -858,7 +858,7 @@ class Presentation:
             if isinstance(shape, GroupShape):
                 self.clear_images(shape.data)
             elif isinstance(shape, Picture):
-                shape.img_path = "resource/pic_placeholder.png"
+                shape.img_path = "../resource/pic_placeholder.png"
 
     def clear_text(self, shapes: list[BaseShape]):
         for shape in shapes:

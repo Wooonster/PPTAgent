@@ -203,6 +203,7 @@ async def websocket_endpoint(websocket: WebSocket, task_id: str):
     try:
         while True:
             data = await websocket.receive_text()
+            logger.info(f'data form await websocket.receive_text() is\n{data}')
     except WebSocketDisconnect:
         logger.info("websocket disconnected", task_id)
         active_connections.pop(task_id, None)
@@ -375,7 +376,7 @@ def ppt_gen(task_id: str, rerun=False):
 
         # doc refine and caption
         if not os.path.exists(pjoin(parsedpdf_dir, "caption.json")):
-            caption_prompt = open("prompts/caption.txt").read()
+            caption_prompt = open("../prompts/caption.txt").read()
             images = {}
             for k in os.listdir(parsedpdf_dir):
                 if is_image_path(k):
@@ -429,12 +430,15 @@ def ppt_gen(task_id: str, rerun=False):
         # PPT Generation
         progress.run_stage(
             pptgen.PPTCrew(text_model, error_exit=False, retry_times=5)
-            .set_examplar(presentation, slide_induction)
+            .set_examplar(
+                presentation,  # ppt
+                slide_induction  #  类别, 功能, 大纲...
+            )
             .generate_pres,
             generation_config,
             images,
             task["numberOfPages"],
-            doc_json,
+            doc_json,  # 内容
         )
         print(task_id, "generation finished")
         progress.report_progress()

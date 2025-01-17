@@ -257,7 +257,7 @@ class Role:
     ):
         self.name = name
         if config is None:  # 无，从 YAML 文件加载
-            with open(f"roles/{name}.yaml", "r") as f:
+            with open(f"../roles/{name}.yaml", "r") as f:
                 config = yaml.safe_load(f)
         if llm is None:  # 无，从配置加载
             llm = globals()[config["use_model"] + "_model"]
@@ -409,7 +409,18 @@ class Role:
 def get_simple_modelname(llms: list[LLM]):
     if isinstance(llms, LLM):
         llms = [llms]
-    return "+".join(re.search(r"^(.*?)-\d{2}", llm.model).group(1) for llm in llms)
+    logger.info(f'llms got in get_simple_modelname is: {llms}')
+    # return "+".join(re.search(r"^(.*?)-\d{2}", llm.model).group(1) for llm in llms)
+
+    model_names = []
+    for llm in llms:
+        # match = re.search(r"^(.*?)-\d{2}", llm.model)
+        match = re.search(r"^(.*?)(?:-GPTQ|-\d{2}|:\d+\.\d+b|Int\d+|Instruct)", llm.model)
+        if match:
+            model_names.append(match.group(1))
+        else:
+            raise ValueError(f"Invalid model name format: {llm.model}")
+    return "+".join(model_names)
 
 
 # gpt4o = LLM(model="gpt-4o-2024-08-06", use_batch=True)
@@ -417,10 +428,20 @@ def get_simple_modelname(llms: list[LLM]):
 
 # intern_vl = LLM(model="InternVL2_5-78B", api_base="http://127.0.0.1:8009/v1")
 
-
+# !ollama serve
+# !ollama run qwen2.5:1.5b
 qwen2_5 = LLM(model="qwen2.5:1.5b", api_base="http://localhost:11434/v1/")  # api_base/key = 'ollama'
+# !python -m vllm.entrypoints.openai.api_server --served-model-name Qwen2-VL-2B-Instruct-GPTQ-Int4 --model Qwen/Qwen2-VL-2B-Instruct-GPTQ-Int4 --download_dir /root/autodl-tmp/qwen/Qwen2-VL-2B --gpu-memory-utilization 0.5
 qwen_vl = LLM(model="Qwen2-VL-2B-Instruct-GPTQ-Int4", api_base="http://localhost:8000/v1")  # openai_api_key = "EMPTY"
-qwen_coder = LLM(model="Qwen/Qwen2.5-Coder-1.5B-Instruct-GPTQ-Int4", api_base="http://127.0.0.1:8008/v1")
+qwen_coder = LLM(model="Qwen2.5-Coder-1.5B-Instruct-GPTQ-Int4", api_base="http://127.0.0.1:8008/v1")
+
+'''
+vllm serve Qwen/Qwen2.5-Coder-1.5B-Instruct-GPTQ-Int4 \
+  --served-model-name Qwen2.5-Coder-1.5B-Instruct-GPTQ-Int4 \
+  --download-dir /root/autodl-tmp/qwen/coder-1.5b \
+  --gpu-memory-utilization 0.2
+  --port 8008
+'''
 
 language_model = qwen2_5
 code_model = qwen2_5

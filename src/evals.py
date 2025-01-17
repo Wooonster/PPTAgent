@@ -127,10 +127,10 @@ def slide_score(slide_folder: str):
     evals = defaultdict(dict)
     if pexists(eval_file):
         evals |= json.load(open(eval_file))
-    text_scorer = Template(open("prompts/ppteval_content.txt", "r").read())
-    vision_scorer = Template(open("prompts/ppteval_style.txt", "r").read())
-    style_descriptor = open("prompts/ppteval_describe_style.txt", "r").read()
-    content_descriptor = open("prompts/ppteval_describe_content.txt", "r").read()
+    text_scorer = Template(open("../prompts/ppteval_content.txt", "r").read())
+    vision_scorer = Template(open("../prompts/ppteval_style.txt", "r").read())
+    style_descriptor = open("../prompts/ppteval_describe_style.txt", "r").read()
+    content_descriptor = open("../prompts/ppteval_describe_content.txt", "r").read()
     for slide_image in glob(pjoin(slide_folder, "slide_*.jpg")):
         slide_descr = slide_image.replace(".jpg", ".json")
         if not os.path.exists(slide_descr):
@@ -174,7 +174,7 @@ def pres_score(prs_source: str):
     if not pexists(slide_descr):
         config = Config("/tmp")
         presentation = Presentation.from_file(prs_source, config)
-        ppt_extractor = Template(open("prompts/ppteval_extract.txt", "r").read())
+        ppt_extractor = Template(open("../prompts/ppteval_extract.txt", "r").read())
         extracted = llms.language_model(
             ppt_extractor.render(presentation=presentation.to_text()),
             return_json=True,
